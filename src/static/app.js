@@ -20,14 +20,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
+        // Build card with a participants section (ul will be populated below)
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <div class="participants">
+            <h5>Participants</h5>
+            <ul class="participants-list" aria-live="polite"></ul>
+          </div>
         `;
 
         activitiesList.appendChild(activityCard);
+
+        // Populate participants list (show friendly text if none)
+        const participantsListEl = activityCard.querySelector(".participants-list");
+        if (Array.isArray(details.participants) && details.participants.length > 0) {
+          details.participants.forEach((p) => {
+            const li = document.createElement("li");
+            // show readable name: prefer part before @ if it's an email
+            const display = typeof p === "string" && p.includes("@") ? p.split("@")[0] : p;
+            li.textContent = display;
+            participantsListEl.appendChild(li);
+          });
+        } else {
+          const li = document.createElement("li");
+          li.textContent = "No participants yet.";
+          li.className = "no-participants";
+          participantsListEl.appendChild(li);
+        }
 
         // Add option to select dropdown
         const option = document.createElement("option");
